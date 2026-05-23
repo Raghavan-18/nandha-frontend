@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Oilseed Advisor</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <!-- Anti-Cache Meta -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="style.css?v=3.0">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- DOMPurify -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"></script>
+</head>
+
+<body class="dashboard-body fade-in">
+
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-leaf logo-icon"></i>
+                <span class="logo-text">Smart Oilseed</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-target="dashboard-home">
+                    <i class="fa-solid fa-gauge"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link" data-target="crop-recommendation">
+                    <i class="fa-solid fa-seedling"></i>
+                    <span>Crop Recommendation</span>
+                </a>
+                <a href="#" class="nav-link" data-target="yield-prediction">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Yield Prediction</span>
+                </a>
+                <a href="#" class="nav-link" data-target="disease-detection">
+                    <i class="fa-solid fa-microscope"></i>
+                    <span>Disease Detection</span>
+                </a>
+                <a href="#" class="nav-link" data-target="market-prices">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <span>Market Prices</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link" id="logoutBtn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h2 id="pageTitle">Dashboard Overview</h2>
+                </div>
+                <div class="topbar-right">
+                    <div class="notification-icon" id="notificationBell">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge" id="notificationBadge">4</span>
+
+                        <!-- Dropdown Panel -->
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="dropdown-header">
+                                <h4>Notifications</h4>
+                                <span class="clear-all" onclick="clearNotifications()">Clear All</span>
+                            </div>
+                            <div class="dropdown-body" id="notificationList">
+                                <div class="notif-item unread">
+                                    <div class="notif-icon success"><i class="fa-solid fa-seedling"></i></div>
+                                    <div class="notif-content">
+                                        <p>Crop recommendation completed</p>
+                                        <span class="time">Just now</span>
+                                    </div>
+                                </div>
+                                <div class="notif-item unread">
+                                    <div class="notif-icon info"><i class="fa-solid fa-chart-line"></i></div>
+                                    <div class="notif-content">
+                                        <p>Yield prediction ready</p>
+                                        <span class="time">10 mins ago</span>
+                                    </div>
+                                </div>
+                                <div class="notif-item unread">
+                                    <div class="notif-icon warning"><i class="fa-solid fa-virus"></i></div>
+                                    <div class="notif-content">
+                                        <p>Disease detected in uploaded image</p>
+                                        <span class="time">1 hour ago</span>
+                                    </div>
+                                </div>
+                                <div class="notif-item unread">
+                                    <div class="notif-icon primary"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                                    <div class="notif-content">
+                                        <p>Market price updated</p>
+                                        <span class="time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff"
+                            alt="User Profile" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role">Farm Manager</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Live Market Ticker -->
+            <div class="ticker-wrap">
+                <div class="ticker" id="liveTicker">
+                    <span class="ticker-item">Fetching live market data...</span>
+                </div>
+            </div>
+
+            <!-- Main Content Sections -->
+            <main class="main-content">
+
+                <!-- SECTION: Dashboard Home (Cards Grid) -->
+                <section id="dashboard-home" class="view-section active">
+                    <div class="welcome-banner">
+                        <div class="banner-content">
+                            <h3>Welcome to AI Agriculture Hub!</h3>
+                            <p>Select a specialized tool below to optimize your oilseed farm operations.</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <!-- Card 1 -->
+                        <div class="image-card" data-navigate="crop-recommendation"
+                            style="background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                            <div class="card-content">
+                                <div class="card-icon"><i class="fa-solid fa-seedling"></i></div>
+                                <h3>Smart Advisor</h3>
+                                <p>Get AI-powered suggestions for the best oilseeds for your land.</p>
+                                <span class="card-btn">Start Advisor <i class="fa-solid fa-play"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="image-card" data-navigate="yield-prediction"
+                            style="background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                            <div class="card-content">
+                                <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <h3>Yield Prediction</h3>
+                                <p>Forecast your seasonal harvest based on environmental conditions.</p>
+                                <span class="card-btn">Explore <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="image-card" data-navigate="disease-detection"
+                            style="background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), url('disease_detection.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                            <div class="card-content">
+                                <div class="card-icon"><i class="fa-solid fa-microscope"></i></div>
+                                <h3>Disease Detection</h3>
+                                <p>Upload plant images to detect diseases</p>
+                                <span class="card-btn">Explore <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="image-card" data-navigate="market-prices"
+                            style="background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), url('https://images.unsplash.com/photo-1556761175-4b46a572b786'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                            <div class="card-content">
+                                <div class="card-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                                <h3>Market Prices</h3>
+                                <p>Track live oilseed commodity pricing and seasonal market trends.</p>
+                                <span class="card-btn">Explore <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: Crop Recommendation -->
+                <section id="crop-recommendation" class="view-section">
+                    <div class="feature-container">
+                        <div class="panel form-panel">
+                            <h3><i class="fa-solid fa-sliders"></i> Input Parameters</h3>
+                            <form id="cropForm">
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label>Soil Type</label>
+                                        <select id="crop_soil_type" name="soil_type">
+                                            <option value="Black Soil">Black Soil (Karichal)</option>
+                                            <option value="Alluvial Soil">Alluvial Soil (Vandhal)</option>
+                                            <option value="Red Soil">Red Soil (Semman)</option>
+                                            <option value="Sandy Soil">Sandy Soil (Manal)</option>
+                                            <option value="Loamy Soil">Loamy Soil (Loamy)</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Current Season</label>
+                                        <select id="crop_season" name="season">
+                                            <option value="Rainy">Kharif (Rainy / ஆடிப் பட்டம்)</option>
+                                            <option value="Winter">Rabi (Winter / புரட்டாசிப் பட்டம்)</option>
+                                            <option value="Summer">Zaid (Summer / சித்திரைப் பட்டம்)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label>Water Availability</label>
+                                        <select id="crop_water" name="water">
+                                            <option value="Low">Low (Rain-fed / Dry)</option>
+                                            <option value="Medium" selected>Medium (Partial Irrigation)</option>
+                                            <option value="High">High (Well Irrigated)</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Soil Health (Fertility)</label>
+                                        <select id="crop_health" name="health">
+                                            <option value="Poor">Poor (Needs Manure)</option>
+                                            <option value="Average" selected>Average (Regular)</option>
+                                            <option value="Rich">Rich (Highly Fertile)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label>Weather Feeling</label>
+                                        <select id="crop_weather" name="weather">
+                                            <option value="Cool">Cool / Cold</option>
+                                            <option value="Pleasant" selected>Pleasant / Normal</option>
+                                            <option value="Hot">Hot / Very Warm</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="crop_location">Your Location</label>
+                                        <div style="display: flex; gap: 8px;">
+                                            <input type="text" id="crop_location" placeholder="e.g. Tamil Nadu, India" style="flex: 1;">
+                                            <button type="button" onclick="window.detectLocation()" 
+                                                style="width: 45px; background: #ecfdf5; border: 1px solid #10b981; color: #10b981; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                                title="Detect My Location">
+                                                <i class="fa-solid fa-location-crosshairs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                                    <button type="button" class="btn-primary" onclick="analyzeCrop()" style="flex: 2; margin-top: 0;">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Manual Suggest
+                                    </button>
+                                    <button type="button" class="btn-secondary" onclick="window.smartAnalyze()" style="flex: 1; margin-top: 0; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                                        <i class="fa-solid fa-bolt"></i> Smart Detect
+                                    </button>
+                                </div>
+                                <div id="cropLoading" style="display:none; margin-top:15px; text-align:center; color:var(--primary); font-weight:600;">
+                                    <i class="fa-solid fa-gear fa-spin"></i> <span id="loadingText">Fetching data for your location...</span>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="panel result-panel">
+                            <h3><i class="fa-solid fa-clipboard-check"></i> Analysis Result</h3>
+                            <div id="cropResult" class="empty-state">
+                                <i class="fa-solid fa-robot"></i>
+                                <p>Awaiting input parameters...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: Yield Prediction -->
+                <section id="yield-prediction" class="view-section">
+                    <div class="feature-container">
+                        <div class="panel form-panel">
+                            <h3><i class="fa-solid fa-chart-bar"></i> Farm Details</h3>
+                            <form id="yieldForm">
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label>Selected Crop</label>
+                                        <select id="yield_crop" name="crop">
+                                            <option value="Groundnut (Nilakkadalai)">Groundnut</option>
+                                            <option value="Mustard (Kadugu)">Mustard</option>
+                                            <option value="Soybean">Soybean</option>
+                                            <option value="Sunflower (Suryagandhi)">Sunflower</option>
+                                            <option value="Sesame (Ellu)">Sesame</option>
+                                            <option value="Safflower (Kusuma)">Safflower</option>
+                                            <option value="Niger seed (Uchellu)">Niger seed</option>
+                                            <option value="Castor seed (Amanakku)">Castor seed</option>
+                                            <option value="Linseed (Alivithai)">Linseed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label>Area (in Acres)</label>
+                                        <input type="number" id="yield_area" name="area" placeholder="10" min="0.1" step="0.1">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-primary w-full" onclick="predictYield()">
+                                    <i class="fa-solid fa-calculator"></i> Calculate Expected Yield
+                                </button>
+                            </form>
+                        </div>
+                        <div class="panel result-panel">
+                            <h3><i class="fa-solid fa-box-open"></i> Estimated Yield</h3>
+                            <div id="yieldResult" class="empty-state">
+                                <i class="fa-solid fa-chart-line"></i>
+                                <p>Enter data to predict yield...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: Disease Detection -->
+                <section id="disease-detection" class="view-section">
+                    <div class="feature-container align-start">
+                        <div class="panel form-panel">
+                            <h3><i class="fa-solid fa-camera"></i> Upload Image</h3>
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fa-solid fa-camera"></i>
+                                <h4>Upload plant image</h4>
+                                <p>or click to browse from your device</p>
+                                <input type="file" id="diseaseImage" accept="image/*" hidden>
+                                <button type="button" class="btn-secondary mt-10"
+                                    onclick="document.getElementById('diseaseImage').click()">Browse Image</button>
+                            </div>
+                            <div class="image-preview-container hide" id="previewContainer">
+                                <img id="imagePreview" src="" alt="Disease Preview">
+                                <div class="preview-actions">
+                                    <button class="btn-secondary btn-sm" onclick="clearPreview()">Remove</button>
+                                    <button class="btn-primary btn-sm" onclick="scanDisease()">Scan Now</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel result-panel">
+                            <h3><i class="fa-solid fa-capsules"></i> Diagnosis & Solution</h3>
+                            <div id="diseaseResult" class="empty-state">
+                                <i class="fa-solid fa-microscope"></i>
+                                <p>Upload an image for diagnosis...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: Market Prices -->
+                <section id="market-prices" class="view-section">
+                    <div class="panel full-width">
+                        <div class="panel-header-flex" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
+                            <h3 style="display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-money-bill-trend-up"></i> Live Tamil Nadu Agricultural Market Prices</h3>
+                            <div class="trending-badge" style="background:#ecfdf5; color:#10b981; padding:5px 12px; border-radius:30px; font-size:0.8rem; font-weight:600;">
+                                <i class="fa-solid fa-circle fa-fade" style="font-size:0.5rem; margin-right:5px;"></i> LIVE MARKET
+                            </div>
+                        </div>
+
+                        <!-- Market Search & Filters -->
+                        <div class="market-search-container" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box" style="flex: 1; min-width: 250px; position: relative;">
+                                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                                <input type="text" id="marketSearchInput" placeholder="Search Market or Crop..." 
+                                    onkeyup="window.filterMarketTable()" style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 8px; border: 1px solid #ddd;">
+                            </div>
+                            <select id="marketDistrictFilter" onchange="window.filterMarketTable()" style="padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: white; min-width: 180px;">
+                                <option value="All">All Districts</option>
+                            </select>
+                            <select id="marketCropFilter" onchange="window.filterMarketTable()" style="padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: white; min-width: 180px;">
+                                <option value="All">All Crops</option>
+                            </select>
+                        </div>
+
+                        <!-- Seasonal Trend Chart -->
+                        <div class="chart-card" style="margin-bottom: 25px; background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <h4 style="color:var(--secondary); font-size:1.1rem;"><i class="fa-solid fa-chart-area"></i> Seasonal Price Trend</h4>
+                                <select id="chartCropSelector" onchange="window.updateChart()" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem;">
+                                    <option value="Mustard">Mustard</option>
+                                    <option value="Soybean">Soybean</option>
+                                    <option value="Groundnut">Groundnut</option>
+                                    <option value="Sunflower">Sunflower</option>
+                                    <option value="Sesame">Sesame</option>
+                                    <option value="Safflower">Safflower</option>
+                                    <option value="Niger">Niger seed</option>
+                                    <option value="Castor">Castor seed</option>
+                                    <option value="Linseed">Linseed</option>
+                                </select>
+                            </div>
+                            <div style="height: 250px;">
+                                <canvas id="priceHistoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="market-table">
+                                <thead>
+                                    <tr>
+                                        <th>Crop Name</th>
+                                        <th>District</th>
+                                        <th>Market Name</th>
+                                        <th>Min Price</th>
+                                        <th>Max Price</th>
+                                        <th>Modal Price</th>
+                                        <th>Trend %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marketTableBody">
+                                    <tr class="loading-row">
+                                        <td colspan="7" style="text-align:center; padding: 30px;">
+                                            <i class="fa-solid fa-spinner fa-spin"></i> Fetching Live Mandi Prices...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase.js"></script>
+
+    <!-- Main Script -->
+    <script src="script.js?v=3.0"></script>
+</body>
+
+</html>

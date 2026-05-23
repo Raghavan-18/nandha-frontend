@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Smart Oilseed Advisor</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="style.css?v=2.1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"></script>
+    <!-- PWA -->
+    <meta name="theme-color" content="#10b981">
+</head>
+
+<body class="login-body">
+    <div class="split-screen">
+        <!-- Left Side: Login Form -->
+        <div class="login-left">
+            <div class="login-form-container">
+                <div class="logo">
+                    <i class="fa-solid fa-leaf"></i>
+                    <span>Smart Oilseed</span>
+                </div>
+
+                <form id="loginForm">
+                    <div class="welcome-text">
+                        <h1>Welcome back</h1>
+                        <p>Enter your details to access the AI agriculture platform.</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope"></i>
+                            <input type="email" id="email" name="email" placeholder="you@gmail.com" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="••••••••" required>
+                            <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <label class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary login-btn">
+                        Sign In <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <!-- Signup Form (Initially Hidden) -->
+                <form id="signupForm" class="hide">
+                    <div class="welcome-text">
+                        <h1>Create Account</h1>
+                        <p>Join the AI agriculture community today.</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="regName">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-user"></i>
+                            <input type="text" id="regName" name="fullname" placeholder="John Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="regEmail">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope"></i>
+                            <input type="email" id="regEmail" name="email" placeholder="you@gmail.com" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="regPassword">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="regPassword" name="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary signup-btn">
+                        Create Account <i class="fa-solid fa-user-plus"></i>
+                    </button>
+
+                    <div class="signup-link">
+                        <p>Already have an account? <a href="#" id="showLogin">Sign in</a></p>
+                    </div>
+                </form>
+
+                <div class="signup-link" id="loginRedirect">
+                    <p>Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Image/Overlay -->
+        <div class="login-right">
+            <div class="overlay"></div>
+            <div class="right-content">
+                <h2>AI-Driven Insights for Modern Agriculture</h2>
+                <p>Empowering farmers with advanced predictive analytics, disease detection, and real-time market data
+                    to maximize oilseed yield.</p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check-circle"></i> Smart Crop Recommendation
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check-circle"></i> Precision Yield Prediction
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-check-circle"></i> Instant Disease Detection
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+        <!-- Firebase Config -->
+        <script src="firebase.js"></script>
+
+        <!-- Main Script -->
+        <script src="script.js"></script>
+</body>
+
+</html>
