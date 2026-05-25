@@ -54,6 +54,10 @@
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                     <span>Market Prices</span>
                 </a>
+                <a href="#" class="nav-link" data-target="profile-settings">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Profile Settings</span>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -424,7 +428,128 @@
                     </div>
                 </section>
 
+                <!-- SECTION: Profile Settings -->
+                <section id="profile-settings" class="view-section">
+                    <div class="profile-container">
+                        <!-- Profile Card -->
+                        <div class="panel profile-card">
+                            <div class="profile-avatar-wrapper">
+                                <img src="https://ui-avatars.com/api/?name=Loading&background=10b981&color=fff" alt="User Avatar" class="profile-large-avatar" id="profileLargeAvatar">
+                                <div class="profile-role-badge">Farm Manager</div>
+                            </div>
+                            <h3 id="profileSummaryName" style="border:none; margin: 15px 0 5px; padding:0; text-align:center;">Loading...</h3>
+                            <p id="profileSummaryEmail" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; text-align:center;">Loading...</p>
+                            <div class="profile-meta-info">
+                                <div class="meta-item">
+                                    <span class="meta-label">Role</span>
+                                    <span class="meta-val">Farm Manager</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Status</span>
+                                    <span class="meta-val status-active"><i class="fa-solid fa-circle"></i> Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Form -->
+                        <div class="panel profile-form-panel">
+                            <div class="profile-tabs">
+                                <button class="profile-tab-btn active" data-tab="personal-info">
+                                    <i class="fa-regular fa-id-card"></i> Personal Info
+                                </button>
+                                <button class="profile-tab-btn" data-tab="security">
+                                    <i class="fa-solid fa-shield-halved"></i> Security
+                                </button>
+                            </div>
+
+                            <!-- Tab 1: Personal Info -->
+                            <div class="tab-content active" id="tab-personal-info">
+                                <form id="profileDetailsForm">
+                                    <div class="input-group">
+                                        <label for="profileName">Full Name</label>
+                                        <div class="input-wrapper">
+                                            <i class="fa-regular fa-user"></i>
+                                            <input type="text" id="profileName" name="name" placeholder="Full Name" disabled required>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="profileEmail">Email Address</label>
+                                        <div class="input-wrapper">
+                                            <i class="fa-regular fa-envelope"></i>
+                                            <input type="email" id="profileEmail" name="email" placeholder="Email Address" disabled required>
+                                        </div>
+                                    </div>
+                                    <div class="profile-actions-bar">
+                                        <button type="button" class="btn-secondary" id="editProfileBtn">
+                                            <i class="fa-regular fa-pen-to-square"></i> Edit Profile
+                                        </button>
+                                        <button type="submit" class="btn-primary hide" id="saveProfileBtn">
+                                            <i class="fa-regular fa-floppy-disk"></i> Save Changes
+                                        </button>
+                                        <button type="button" class="btn-secondary hide" id="cancelEditBtn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Tab 2: Security -->
+                            <div class="tab-content" id="tab-security">
+                                <form id="changePasswordForm">
+                                    <div class="input-group">
+                                        <label for="profileNewPassword">New Password</label>
+                                        <div class="input-wrapper">
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" id="profileNewPassword" name="newPassword" placeholder="Minimum 6 characters" required>
+                                            <i class="fa-regular fa-eye toggle-password" id="toggleNewPassword"></i>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="profileConfirmPassword">Confirm Password</label>
+                                        <div class="input-wrapper">
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" id="profileConfirmPassword" name="confirmPassword" placeholder="••••••••" required>
+                                            <i class="fa-regular fa-eye toggle-password" id="toggleConfirmPassword"></i>
+                                        </div>
+                                    </div>
+                                    <div class="profile-actions-bar">
+                                        <button type="submit" class="btn-primary" id="savePasswordBtn">
+                                            <i class="fa-solid fa-key"></i> Update Password
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </main>
+
+            <!-- Modal: Re-authentication -->
+            <div id="reauthModal" class="modal-overlay hide">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h3><i class="fa-solid fa-shield-halved"></i> Security Verification</h3>
+                        <button class="modal-close" id="closeReauthModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="margin-bottom:15px; font-size:0.9rem; color:var(--text-muted);">For security reasons, please enter your current password to confirm these sensitive profile changes.</p>
+                        <form id="reauthForm">
+                            <div class="input-group">
+                                <label for="reauthPassword">Current Password</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input type="password" id="reauthPassword" placeholder="••••••••" required>
+                                    <i class="fa-regular fa-eye toggle-password" id="toggleReauthPassword"></i>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary w-full" id="reauthSubmitBtn" style="margin-top: 10px;">
+                                Verify & Continue
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
