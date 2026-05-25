@@ -1,5 +1,5 @@
 console.log(firebase);
-const API_BASE_URL = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+const API_BASE_URL = 'https://nandha-backend-6azag5bue-raghavan-18s-projects.vercel.app';
 
 window.apiFetch = async function (url, options = {}) {
     options.credentials = 'include';
@@ -19,32 +19,6 @@ window.apiFetch = async function (url, options = {}) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- 0.0 Early Session Check & Redirect ---
-    const isLoginPage = document.querySelector('.login-body');
-    if (isLoginPage) {
-        const splitScreen = document.querySelector('.split-screen');
-        if (localStorage.getItem('user') && splitScreen) {
-            splitScreen.style.opacity = '0';
-            const loader = document.createElement('div');
-            loader.id = 'auth-loader';
-            loader.innerHTML = `<div class="auth-spinner"><i class="fa-solid fa-leaf fa-spin"></i><span>Restoring session...</span></div>`;
-            document.body.appendChild(loader);
-        }
-
-        if (typeof firebase !== 'undefined') {
-            firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    localStorage.setItem('user', user.email);
-                    window.location.replace('main_advisor.html');
-                } else {
-                    const loader = document.getElementById('auth-loader');
-                    if (loader) loader.remove();
-                    if (splitScreen) splitScreen.style.opacity = '1';
-                }
-            });
-        }
-    }
 
     // --- 0. Toast Notification System ---
     window.showNotification = function (message, type = 'info') {
@@ -311,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof firebase !== 'undefined') {
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (!user) {
-                    window.location.replace('index.html');
+                    window.location.href = 'index.html';
                 } else {
                     localStorage.setItem('user', user.email);
                     
@@ -418,8 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'crop-recommendation': 'Crop Recommendation AI',
             'yield-prediction': 'Yield Prediction Tool',
             'disease-detection': 'Disease Diagnosis',
-            'market-prices': 'Live Market Prices',
-            'profile-settings': 'Profile Settings'
+            'market-prices': 'Live Market Prices'
         };
 
         function activateSection(targetId) {
@@ -439,25 +412,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetSec = document.getElementById(targetId);
             if (targetSec) {
                 targetSec.classList.add('active');
-                pageTitle.textContent = mapTitle[targetId] || 'Dashboard Overview';
+                pageTitle.textContent = mapTitle[targetId];
             }
         }
-
-        // Global navigate function to handle pushState and actions
-        window.navigateToSection = function (targetId) {
-            const currentHash = window.location.hash.substring(1);
-            if (targetId === currentHash) return;
-
-            history.pushState({ section: targetId }, '', '#' + targetId);
-            activateSection(targetId);
-
-            if (targetId === 'market-prices') {
-                window.loadMarketPrices();
-                window.updateChart();
-            } else if (targetId === 'profile-settings') {
-                window.loadProfileData();
-            }
-        };
 
         // Sidebar clicks
         navLinks.forEach(link => {
@@ -465,7 +422,11 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const target = link.getAttribute('data-target');
-                window.navigateToSection(target);
+                activateSection(target);
+                if (target === 'market-prices') {
+                    window.loadMarketPrices();
+                    window.updateChart();
+                }
             });
         });
 
@@ -473,47 +434,13 @@ document.addEventListener('DOMContentLoaded', () => {
         imageCards.forEach(card => {
             card.addEventListener('click', () => {
                 const target = card.getAttribute('data-navigate');
-                window.navigateToSection(target);
-            });
-        });
-
-        // Make user profile in topbar clickable to navigate to profile settings
-        const userProfile = document.querySelector('.user-profile');
-        if (userProfile) {
-            userProfile.addEventListener('click', () => {
-                window.navigateToSection('profile-settings');
-            });
-        }
-
-        // Listen to back/forward button history navigation
-        window.addEventListener('popstate', (e) => {
-            let targetId = 'dashboard-home';
-            if (e.state && e.state.section) {
-                targetId = e.state.section;
-            } else {
-                const hash = window.location.hash.substring(1);
-                if (hash && mapTitle[hash]) {
-                    targetId = hash;
+                activateSection(target);
+                if (target === 'market-prices') {
+                    window.loadMarketPrices();
+                    window.updateChart();
                 }
-            }
-            activateSection(targetId);
-
-            if (targetId === 'market-prices') {
-                window.loadMarketPrices();
-                window.updateChart();
-            } else if (targetId === 'profile-settings') {
-                window.loadProfileData();
-            }
+            });
         });
-
-        // Resolve initial section from URL Hash on page load
-        let initialSection = 'dashboard-home';
-        const initialHash = window.location.hash.substring(1);
-        if (initialHash && mapTitle[initialHash]) {
-            initialSection = initialHash;
-        }
-        history.replaceState({ section: initialSection }, '', '#' + initialSection);
-        activateSection(initialSection);
 
         // Logout
         const logoutBtn = document.getElementById('logoutBtn');
@@ -528,339 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error("Firebase sign out failed:", err);
                 }
                 localStorage.clear();
-                window.location.replace('index.html');
-            });
-        }
-
-        // --- Profile Settings & Security Tab System ---
-        const profileTabBtns = document.querySelectorAll('.profile-tab-btn');
-        const tabContents = document.querySelectorAll('.profile-form-panel .tab-content');
-
-        profileTabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                profileTabBtns.forEach(b => b.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-
-                btn.classList.add('active');
-                const tabId = 'tab-' + btn.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-
-        // Toggle Edit State
-        const editProfileBtn = document.getElementById('editProfileBtn');
-        const saveProfileBtn = document.getElementById('saveProfileBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const profileName = document.getElementById('profileName');
-        const profileEmail = document.getElementById('profileEmail');
-
-        let originalProfileName = '';
-        let originalProfileEmail = '';
-
-        function setProfileEditState(isEditing) {
-            if (profileName) profileName.disabled = !isEditing;
-            if (profileEmail) profileEmail.disabled = !isEditing;
-
-            if (isEditing) {
-                if (editProfileBtn) editProfileBtn.classList.add('hide');
-                if (saveProfileBtn) saveProfileBtn.classList.remove('hide');
-                if (cancelEditBtn) cancelEditBtn.classList.remove('hide');
-            } else {
-                if (editProfileBtn) editProfileBtn.classList.remove('hide');
-                if (saveProfileBtn) saveProfileBtn.classList.add('hide');
-                if (cancelEditBtn) cancelEditBtn.classList.add('hide');
-            }
-        }
-
-        if (editProfileBtn) {
-            editProfileBtn.addEventListener('click', () => {
-                originalProfileName = profileName ? profileName.value : '';
-                originalProfileEmail = profileEmail ? profileEmail.value : '';
-                setProfileEditState(true);
-            });
-        }
-
-        if (cancelEditBtn) {
-            cancelEditBtn.addEventListener('click', () => {
-                if (profileName) profileName.value = originalProfileName;
-                if (profileEmail) profileEmail.value = originalProfileEmail;
-                setProfileEditState(false);
-            });
-        }
-
-        // Re-authentication handling
-        const reauthModal = document.getElementById('reauthModal');
-        const closeReauthModal = document.getElementById('closeReauthModal');
-        const reauthForm = document.getElementById('reauthForm');
-        let pendingReauthCallback = null;
-
-        function showReauthModal(callback) {
-            pendingReauthCallback = callback;
-            if (reauthModal) {
-                const reauthPasswordInput = document.getElementById('reauthPassword');
-                if (reauthPasswordInput) reauthPasswordInput.value = '';
-                reauthModal.classList.remove('hide');
-            }
-        }
-
-        if (closeReauthModal) {
-            closeReauthModal.addEventListener('click', () => {
-                if (reauthModal) reauthModal.classList.add('hide');
-                pendingReauthCallback = null;
-            });
-        }
-
-        if (reauthForm) {
-            reauthForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const reauthPasswordInput = document.getElementById('reauthPassword');
-                const password = reauthPasswordInput ? reauthPasswordInput.value : '';
-                const submitBtn = document.getElementById('reauthSubmitBtn');
-                const originalHtml = submitBtn ? submitBtn.innerHTML : 'Verify & Continue';
-
-                if (submitBtn) {
-                    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying...`;
-                    submitBtn.disabled = true;
-                }
-
-                try {
-                    const user = firebase.auth().currentUser;
-                    if (!user) throw new Error("No user currently logged in.");
-
-                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
-                    await user.reauthenticateWithCredential(credential);
-
-                    if (reauthModal) reauthModal.classList.add('hide');
-                    window.showNotification("Verification successful.", "success");
-
-                    if (pendingReauthCallback) {
-                        const callback = pendingReauthCallback;
-                        pendingReauthCallback = null;
-                        await callback();
-                    }
-                } catch (err) {
-                    console.error("Re-authentication failed:", err);
-                    let msg = "Verification failed. Please check your password.";
-                    if (err.code === 'auth/wrong-password') {
-                        msg = "Incorrect password. Please try again.";
-                    } else if (err.message) {
-                        msg = err.message;
-                    }
-                    window.showNotification(msg, "error");
-                } finally {
-                    if (submitBtn) {
-                        submitBtn.innerHTML = originalHtml;
-                        submitBtn.disabled = false;
-                    }
-                }
-            });
-        }
-
-        // Load profile data
-        window.loadProfileData = async function () {
-            if (typeof firebase === 'undefined') return;
-            const user = firebase.auth().currentUser;
-            if (!user) return;
-
-            const summaryNameEl = document.getElementById('profileSummaryName');
-            const summaryEmailEl = document.getElementById('profileSummaryEmail');
-            const largeAvatarEl = document.getElementById('profileLargeAvatar');
-
-            // Set Auth values first
-            if (profileEmail) profileEmail.value = user.email;
-            if (summaryEmailEl) summaryEmailEl.textContent = user.email;
-
-            let displayName = user.email.split('@')[0];
-
-            try {
-                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                if (userDoc.exists && userDoc.data().name) {
-                    displayName = userDoc.data().name;
-                }
-            } catch (err) {
-                console.error("Firestore get profile details error:", err);
-            }
-
-            if (profileName) profileName.value = displayName;
-            if (summaryNameEl) summaryNameEl.textContent = displayName;
-
-            const initials = displayName;
-            if (largeAvatarEl) {
-                largeAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=10b981&color=fff&size=120`;
-            }
-        };
-
-        // Submit Profile Details Changes
-        const profileDetailsForm = document.getElementById('profileDetailsForm');
-        if (profileDetailsForm) {
-            profileDetailsForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const newName = profileName ? profileName.value.trim() : '';
-                const newEmail = profileEmail ? profileEmail.value.trim() : '';
-
-                // Validations
-                if (!newName) {
-                    window.showNotification("Name cannot be empty.", "error");
-                    return;
-                }
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(newEmail)) {
-                    window.showNotification("Please enter a valid email address.", "error");
-                    return;
-                }
-
-                const saveBtn = document.getElementById('saveProfileBtn');
-                const originalHtml = saveBtn ? saveBtn.innerHTML : 'Save Changes';
-                if (saveBtn) {
-                    saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving...`;
-                    saveBtn.disabled = true;
-                }
-
-                const executeProfileUpdate = async () => {
-                    const user = firebase.auth().currentUser;
-                    if (!user) return;
-
-                    const emailChanged = user.email.toLowerCase() !== newEmail.toLowerCase();
-
-                    try {
-                        if (emailChanged) {
-                            await user.updateEmail(newEmail);
-                        }
-
-                        // Update Firestore collection
-                        await firebase.firestore().collection('users').doc(user.uid).set({
-                            name: newName,
-                            email: newEmail,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true });
-
-                        localStorage.setItem('user', newEmail);
-                        localStorage.setItem('userName', newName);
-
-                        // Refresh local profile elements
-                        await window.loadProfileData();
-
-                        // Sync topbar user profile layout
-                        const topbarName = document.querySelector('.user-profile .user-name');
-                        const topbarAvatar = document.querySelector('.user-profile .avatar');
-                        if (topbarName) topbarName.textContent = newName;
-                        if (topbarAvatar) topbarAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=10b981&color=fff`;
-
-                        setProfileEditState(false);
-                        window.showNotification("Profile updated successfully.", "success");
-                    } catch (err) {
-                        console.error("Profile update failed:", err);
-                        if (err.code === 'auth/requires-recent-login') {
-                            showReauthModal(executeProfileUpdate);
-                        } else {
-                            let msg = "Failed to update profile.";
-                            if (err.code === 'auth/email-already-in-use') {
-                                msg = "This email is already in use by another account.";
-                            } else if (err.message) {
-                                msg = err.message;
-                            }
-                            window.showNotification(msg, "error");
-                        }
-                    }
-                };
-
-                await executeProfileUpdate();
-                if (saveBtn) {
-                    saveBtn.innerHTML = originalHtml;
-                    saveBtn.disabled = false;
-                }
-            });
-        }
-
-        // Change Password Changes
-        const changePasswordForm = document.getElementById('changePasswordForm');
-        if (changePasswordForm) {
-            changePasswordForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const newPasswordInput = document.getElementById('profileNewPassword');
-                const confirmPasswordInput = document.getElementById('profileConfirmPassword');
-                const newPassword = newPasswordInput ? newPasswordInput.value : '';
-                const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
-
-                // Validation
-                if (newPassword.length < 6) {
-                    window.showNotification("Password must be at least 6 characters long.", "error");
-                    return;
-                }
-                if (newPassword !== confirmPassword) {
-                    window.showNotification("Passwords do not match.", "error");
-                    return;
-                }
-
-                const passwordBtn = document.getElementById('savePasswordBtn');
-                const originalHtml = passwordBtn ? passwordBtn.innerHTML : 'Update Password';
-                if (passwordBtn) {
-                    passwordBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
-                    passwordBtn.disabled = true;
-                }
-
-                const executePasswordUpdate = async () => {
-                    const user = firebase.auth().currentUser;
-                    if (!user) return;
-
-                    try {
-                        await user.updatePassword(newPassword);
-                        if (newPasswordInput) newPasswordInput.value = '';
-                        if (confirmPasswordInput) confirmPasswordInput.value = '';
-                        window.showNotification("Password updated successfully.", "success");
-                    } catch (err) {
-                        console.error("Password update failed:", err);
-                        if (err.code === 'auth/requires-recent-login') {
-                            showReauthModal(executePasswordUpdate);
-                        } else {
-                            let msg = "Failed to update password.";
-                            if (err.message) msg = err.message;
-                            window.showNotification(msg, "error");
-                        }
-                    }
-                };
-
-                await executePasswordUpdate();
-                if (passwordBtn) {
-                    passwordBtn.innerHTML = originalHtml;
-                    passwordBtn.disabled = false;
-                }
-            });
-        }
-
-        // Password visibility toggles for new inputs
-        const toggleNewPassword = document.getElementById('toggleNewPassword');
-        const newPasswordInputVal = document.getElementById('profileNewPassword');
-        if (toggleNewPassword && newPasswordInputVal) {
-            toggleNewPassword.addEventListener('click', () => {
-                const type = newPasswordInputVal.getAttribute('type') === 'password' ? 'text' : 'password';
-                newPasswordInputVal.setAttribute('type', type);
-                toggleNewPassword.classList.toggle('fa-eye');
-                toggleNewPassword.classList.toggle('fa-eye-slash');
-            });
-        }
-
-        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-        const confirmPasswordInputVal = document.getElementById('profileConfirmPassword');
-        if (toggleConfirmPassword && confirmPasswordInputVal) {
-            toggleConfirmPassword.addEventListener('click', () => {
-                const type = confirmPasswordInputVal.getAttribute('type') === 'password' ? 'text' : 'password';
-                confirmPasswordInputVal.setAttribute('type', type);
-                toggleConfirmPassword.classList.toggle('fa-eye');
-                toggleConfirmPassword.classList.toggle('fa-eye-slash');
-            });
-        }
-
-        const toggleReauthPassword = document.getElementById('toggleReauthPassword');
-        const reauthPasswordInputVal = document.getElementById('reauthPassword');
-        if (toggleReauthPassword && reauthPasswordInputVal) {
-            toggleReauthPassword.addEventListener('click', () => {
-                const type = reauthPasswordInputVal.getAttribute('type') === 'password' ? 'text' : 'password';
-                reauthPasswordInputVal.setAttribute('type', type);
-                toggleReauthPassword.classList.toggle('fa-eye');
-                toggleReauthPassword.classList.toggle('fa-eye-slash');
+                window.location.href = 'index.html';
             });
         }
 
